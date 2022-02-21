@@ -1,23 +1,24 @@
 import 'dart:math';
 
-import 'package:cool_graph/constants.dart';
 import 'package:flutter/material.dart';
 
 class LinePainter extends CustomPainter {
   late Paint painter;
-
-  LinePainter() {
+  final double thickness;
+  final Color? selectedColor;
+  LinePainter({required this.thickness, required this.selectedColor}) {
     painter = Paint()
-      ..color = Color.fromRGBO(Random().nextInt(256), Random().nextInt(256),
-          Random().nextInt(256), 1)
+      ..color = selectedColor ??
+          Color.fromRGBO(Random().nextInt(256), Random().nextInt(256),
+              Random().nextInt(256), 1)
       ..strokeWidth = thickness
       ..style = PaintingStyle.stroke;
   }
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawLine(
-        const Offset(0, 0), Offset(size.width, size.height), painter);
+    canvas.drawLine(Offset(-thickness, -thickness),
+        Offset(size.width + thickness, size.height + thickness), painter);
   }
 
   @override
