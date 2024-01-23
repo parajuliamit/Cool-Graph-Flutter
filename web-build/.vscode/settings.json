@@ -1,4 +1,0 @@
-{
-    "appService.defaultWebAppToDeploy": "/subscriptions/3b3d0c2b-907c-489f-98fd-2d287bcd18c2/resourceGroups/DefaultResourceGroup-CUS/providers/Microsoft.Web/sites/cool-graph",
-    "appService.deploySubpath": "."
-}

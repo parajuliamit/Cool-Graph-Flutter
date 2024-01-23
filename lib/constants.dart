@@ -1,6 +1,9 @@
+import 'package:flutter/material.dart';
+
 const double graphHeight = 300;
-// const double thickness = 1;
-// const int numberOfLines = 100;
 
+const kPurpleColor = Color.fromRGBO(138, 43, 226, 1);
 
-// TODO: Add user input for graph color
+const double spacing = 20;
+const double height = 400;
+const double width = 400;

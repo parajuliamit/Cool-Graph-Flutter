@@ -1,21 +1,43 @@
 import 'package:flutter/material.dart';
 
-import 'widgets/home_page.dart';
+import 'pages/cool_graph.dart';
+import 'pages/home_page.dart';
+import 'pages/maze_generator.dart';
+import 'pages/purple_rain.dart';
+import 'pages/sand_falling.dart';
+import 'pages/snake_game.dart';
+import 'pages/sudoku_solver.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-//stateless widget
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Cool Graph',
+    return MaterialApp(
+      title: 'Flutter Projects',
+      theme: ThemeData(
+        scaffoldBackgroundColor: Colors.black,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.black,
+          elevation: 0,
+          foregroundColor: Colors.white,
+        ),
+      ),
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      routes: <String, WidgetBuilder>{
+        "/": (context) => const HomePage(),
+        "/cool-graph": (context) => const CoolGraph(),
+        "/sand-falling": (context) => const SandFalling(),
+        "/purple-rain": (context) => const PurpleRain(),
+        "/maze-generator": (context) => const MazeGenerator(),
+        "/snake-game": (context) => const SnakeGame(),
+        "/sudoku-solver": (context) => const SudokuSolver(),
+      },
+      initialRoute: "/",
     );
   }
 }
