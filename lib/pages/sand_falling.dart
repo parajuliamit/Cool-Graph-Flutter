@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 
@@ -14,38 +15,49 @@ const int _gridSize = 50;
 class _SandFallingState extends State<SandFalling> {
   late final Timer _timer;
 
-  final List<List<bool>> _grid =
-      List.generate(_gridSize, (_) => List.filled(_gridSize, false));
-  final List<List<bool>> _nextGrid =
-      List.generate(_gridSize, (_) => List.filled(_gridSize, false));
+  final Set<(int, int)> _grid = {};
 
-  void resetGrid(List<List<bool>> _resetGrid) {
-    for (int x = 0; x < _resetGrid.length; x++) {
-      for (int y = 0; y < _resetGrid[x].length; y++) {
-        _resetGrid[x][y] = false;
-      }
-    }
-  }
+  final Set<(int, int)> _nextGrid = {};
+
+  bool _stopAnimating = false;
 
   void _updateGrid() {
-    resetGrid(_nextGrid);
-    for (int x = 0; x < _gridSize; x++) {
-      for (int y = 0; y < _gridSize; y++) {
-        if (_grid[x][y]) {
-          if (x < _gridSize - 1 && !_grid[x + 1][y]) {
-            _nextGrid[x + 1][y] = true;
+    if (_stopAnimating) {
+      return;
+    }
+    print("Updating grid");
+    _nextGrid.clear();
+
+    for (var data in _grid) {
+      int x = data.$1;
+      int y = data.$2;
+      if (y < _gridSize - 1) {
+        if (!_grid.contains((x, y + 1))) {
+          _nextGrid.add((x, y + 1));
+        } else {
+          Random random = Random();
+          bool left = random.nextBool();
+          bool leftAvailable = x - 1 >= 0 && !_grid.contains((x - 1, y + 1));
+          bool rightAvailable =
+              x + 1 < _gridSize && !_grid.contains((x + 1, y + 1));
+          if (leftAvailable && (left || !rightAvailable)) {
+            _nextGrid.add((x - 1, y + 1));
+          } else if (rightAvailable) {
+            _nextGrid.add((x + 1, y + 1));
           } else {
-            _nextGrid[x][y] = true;
+            _nextGrid.add((x, y));
           }
         }
+      } else {
+        _nextGrid.add((x, y));
       }
     }
+    if (_nextGrid.toString() == _grid.toString()) {
+      _stopAnimating = true;
+    }
     setState(() {
-      for (int x = 0; x < _gridSize; x++) {
-        for (int y = 0; y < _gridSize; y++) {
-          _grid[x][y] = _nextGrid[x][y];
-        }
-      }
+      _grid.clear();
+      _grid.addAll(_nextGrid);
     });
   }
 
@@ -53,14 +65,23 @@ class _SandFallingState extends State<SandFalling> {
   void initState() {
     super.initState();
     _updateGrid();
-    _timer = Timer.periodic(
-        const Duration(milliseconds: 1000), (_) => _updateGrid());
+    _timer =
+        Timer.periodic(const Duration(milliseconds: 100), (_) => _updateGrid());
   }
 
   @override
   void dispose() {
     _timer.cancel();
     super.dispose();
+  }
+
+  void _addToGrid(details, double height, double width) {
+    int x = (details.localPosition.dx / (width / _gridSize)).floor();
+    int y = (details.localPosition.dy / (height / _gridSize)).floor();
+    if (x < _gridSize && y < _gridSize) {
+      _grid.add((x, y));
+    }
+    _stopAnimating = false;
   }
 
   @override
@@ -75,35 +96,34 @@ class _SandFallingState extends State<SandFalling> {
           double width = constraints.maxWidth;
           return GestureDetector(
             onPanUpdate: (details) {
-              int x = (details.localPosition.dx / (width / _gridSize)).floor();
-              int y = (details.localPosition.dy / (height / _gridSize)).floor();
-              if (x < _gridSize && y < _gridSize) {
-                setState(() {
-                  _grid[y][x] = true;
-                });
-              }
+              _addToGrid(details, height, width);
             },
             onPanDown: (details) {
-              int x = (details.localPosition.dx / (width / _gridSize)).floor();
-              int y = (details.localPosition.dy / (height / _gridSize)).floor();
-              if (x < _gridSize && y < _gridSize) {
-                setState(() {
-                  _grid[y][x] = true;
-                });
-              }
+              _addToGrid(details, height, width);
             },
-            child: Column(
-              children: List.generate(_gridSize, (x) {
-                return Row(
-                  children: List.generate(_gridSize, (y) {
-                    return Container(
+            child: Stack(
+              children: [
+                Container(
+                  height: height,
+                  width: width,
+                  color: Colors.black,
+                ),
+                ...List.generate(_grid.length, (index) {
+                  var data = _grid.elementAt(index);
+                  int x = data.$1;
+                  int y = data.$2;
+                  return Positioned(
+                    left: x * (width / _gridSize),
+                    top: y * (height / _gridSize),
+                    child: Container(
                       height: height / _gridSize,
                       width: width / _gridSize,
-                      color: _grid[x][y] ? Colors.white : Colors.black,
-                    );
-                  }),
-                );
-              }),
+                      color: HSLColor.fromAHSL(1, (index / 2.5) % 360, 1, 0.5)
+                          .toColor(),
+                    ),
+                  );
+                }),
+              ],
             ),
           );
         },
