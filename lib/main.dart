@@ -2,7 +2,8 @@ import 'package:cool_graph/pages/cool_graph.dart';
 import 'package:cool_graph/pages/sand_falling.dart';
 import 'package:flutter/material.dart';
 
-import 'widgets/home_page.dart';
+import 'pages/home_page.dart';
+import 'pages/purple_rain.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Cool Graph',
+      title: 'Visualizations',
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.black,
         appBarTheme: const AppBarTheme(
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
         "/": (context) => const HomePage(),
         "/cool-graph": (context) => const CoolGraph(),
         "/sand-falling": (context) => const SandFalling(),
+        "/purple-rain": (context) => const PurpleRain(),
       },
       initialRoute: "/",
     );

@@ -7,7 +7,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Visualize"),
+          title: const Text("Visualizations"),
         ),
         body: Center(
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -22,6 +22,13 @@ class HomePage extends StatelessWidget {
               child: const Text("Sand Falling"),
               onPressed: () {
                 Navigator.pushNamed(context, "/sand-falling");
+              },
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              child: const Text("Purple Rain"),
+              onPressed: () {
+                Navigator.pushNamed(context, "/purple-rain");
               },
             ),
           ]),
