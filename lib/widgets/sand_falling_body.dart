@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -11,16 +12,20 @@ class SandFallingBody extends StatefulWidget {
 
 const int _gridCellSize = 10;
 
-class _SandFallingBodyState extends State<SandFallingBody>
-    with TickerProviderStateMixin {
-  late final AnimationController _controller;
+class _SandFallingBodyState extends State<SandFallingBody> {
+  late final Timer _timer;
   late final Random random;
   late final int _gridSizeH;
   late final int _gridSizeW;
   final Set<(int, int)> _grid = {};
   final Set<(int, int)> _nextGrid = {};
 
+  bool _stopAnimation = true;
+
   void _updateGrid() {
+    if (_stopAnimation) {
+      return;
+    }
     _nextGrid.clear();
     for (var data in _grid) {
       int x = data.$1;
@@ -46,7 +51,7 @@ class _SandFallingBodyState extends State<SandFallingBody>
       }
     }
     if (_nextGrid.toString() == _grid.toString()) {
-      _controller.stop();
+      _stopAnimation = true;
     }
     setState(() {
       _grid.clear();
@@ -60,16 +65,14 @@ class _SandFallingBodyState extends State<SandFallingBody>
     _gridSizeH = (widget.size.height / _gridCellSize).floor();
     _gridSizeW = (widget.size.height / _gridCellSize).floor();
     random = Random();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    )..addListener(_updateGrid);
-    _controller.repeat();
+    _timer = Timer.periodic(const Duration(milliseconds: 80), (timer) {
+      _updateGrid();
+    });
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _timer.cancel();
     super.dispose();
   }
 
@@ -83,9 +86,7 @@ class _SandFallingBodyState extends State<SandFallingBody>
         }
       }
     }
-    if (!_controller.isAnimating) {
-      _controller.repeat();
-    }
+    _stopAnimation = false;
   }
 
   @override

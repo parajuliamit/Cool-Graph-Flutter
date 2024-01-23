@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -179,134 +179,138 @@ class _SnakeGameState extends State<SnakeGame> {
       appBar: AppBar(
         title: const Text("Snake Game"),
       ),
-      body: RawKeyboardListener(
-        autofocus: true,
-        focusNode: FocusNode(),
-        onKey: _handleKeyEvent,
-        child: FittedBox(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text('Score: ${length - 1}',
-                    style: const TextStyle(
-                        fontSize: 20,
-                        color: Colors.blueGrey,
-                        fontWeight: FontWeight.bold)),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blueGrey, width: 1)),
-                height: height.toDouble(),
-                width: width.toDouble(),
-                child: Stack(children: [
-                  Positioned(
-                      top: foodY.toDouble(),
-                      left: foodX.toDouble(),
-                      child: Container(
-                        margin: const EdgeInsets.all(2),
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                        width: size.toDouble() - 4,
-                        height: size.toDouble() - 4,
-                      )),
-                  ...List.generate(
-                      length,
-                      (index) => Snake(
-                            x: snakeX[index],
-                            y: snakeY[index],
-                          )),
-                  Snake(
-                    x: x,
-                    y: y,
-                  ),
-                  Visibility(
-                    visible: isCompleted,
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'GAME OVER',
-                            style: TextStyle(
-                                color: Colors.red.shade600,
-                                fontSize: 40,
-                                fontWeight: FontWeight.bold),
+      body: Center(
+        child: RawKeyboardListener(
+          autofocus: true,
+          focusNode: FocusNode(),
+          onKey: _handleKeyEvent,
+          child: FittedBox(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text('Score: ${length - 1}',
+                      style: const TextStyle(
+                          fontSize: 20,
+                          color: Colors.blueGrey,
+                          fontWeight: FontWeight.bold)),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.blueGrey, width: 1)),
+                  height: height.toDouble(),
+                  width: width.toDouble(),
+                  child: Stack(children: [
+                    Positioned(
+                        top: foodY.toDouble(),
+                        left: foodX.toDouble(),
+                        child: Container(
+                          margin: const EdgeInsets.all(2),
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
                           ),
-                          MediaQuery.of(context).size.height >
-                                      MediaQuery.of(context).size.width ||
-                                  Platform.isIOS ||
-                                  Platform.isAndroid
-                              ? ElevatedButton(
-                                  onPressed: () {
-                                    reset();
-                                  },
-                                  child: const Text('Restart'),
-                                )
-                              : Text(
-                                  'Press SPACE to restart',
-                                  style: TextStyle(
-                                      color: Colors.red.shade600,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                        ],
+                          width: size.toDouble() - 4,
+                          height: size.toDouble() - 4,
+                        )),
+                    ...List.generate(
+                        length,
+                        (index) => Snake(
+                              x: snakeX[index],
+                              y: snakeY[index],
+                            )),
+                    Snake(
+                      x: x,
+                      y: y,
+                    ),
+                    Visibility(
+                      visible: isCompleted,
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'GAME OVER',
+                              style: TextStyle(
+                                  color: Colors.red.shade600,
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            MediaQuery.of(context).size.height >
+                                        MediaQuery.of(context).size.width ||
+                                    defaultTargetPlatform ==
+                                        TargetPlatform.iOS ||
+                                    defaultTargetPlatform ==
+                                        TargetPlatform.android
+                                ? ElevatedButton(
+                                    onPressed: () {
+                                      reset();
+                                    },
+                                    child: const Text('Restart'),
+                                  )
+                                : Text(
+                                    'Press SPACE to restart',
+                                    style: TextStyle(
+                                        color: Colors.red.shade600,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ]),
-              ),
-              if (!isCompleted &&
-                      (MediaQuery.of(context).size.height >
-                          MediaQuery.of(context).size.width) ||
-                  Platform.isIOS ||
-                  Platform.isAndroid)
-                Column(
-                  children: [
-                    const SizedBox(
-                      height: 32,
-                    ),
-                    FloatingActionButton(
-                      heroTag: 'up',
-                      onPressed: () {
-                        _onScreenKeyEvent('up');
-                      },
-                      child: const Icon(Icons.keyboard_arrow_up),
-                    ),
-                    Row(
-                      children: [
-                        FloatingActionButton(
-                          heroTag: 'left',
-                          onPressed: () {
-                            _onScreenKeyEvent('left');
-                          },
-                          child: const Icon(Icons.keyboard_arrow_left),
-                        ),
-                        const SizedBox(
-                          width: 50,
-                        ),
-                        FloatingActionButton(
-                          heroTag: 'right',
-                          onPressed: () {
-                            _onScreenKeyEvent('right');
-                          },
-                          child: const Icon(Icons.keyboard_arrow_right),
-                        ),
-                      ],
-                    ),
-                    FloatingActionButton(
-                      heroTag: 'down',
-                      onPressed: () {
-                        _onScreenKeyEvent('down');
-                      },
-                      child: const Icon(Icons.keyboard_arrow_down),
-                    ),
-                  ],
+                  ]),
                 ),
-            ],
+                if (!isCompleted &&
+                        (MediaQuery.of(context).size.height >
+                            MediaQuery.of(context).size.width) ||
+                    defaultTargetPlatform == TargetPlatform.iOS ||
+                    defaultTargetPlatform == TargetPlatform.android)
+                  Column(
+                    children: [
+                      const SizedBox(
+                        height: 32,
+                      ),
+                      FloatingActionButton(
+                        heroTag: 'up',
+                        onPressed: () {
+                          _onScreenKeyEvent('up');
+                        },
+                        child: const Icon(Icons.keyboard_arrow_up),
+                      ),
+                      Row(
+                        children: [
+                          FloatingActionButton(
+                            heroTag: 'left',
+                            onPressed: () {
+                              _onScreenKeyEvent('left');
+                            },
+                            child: const Icon(Icons.keyboard_arrow_left),
+                          ),
+                          const SizedBox(
+                            width: 50,
+                          ),
+                          FloatingActionButton(
+                            heroTag: 'right',
+                            onPressed: () {
+                              _onScreenKeyEvent('right');
+                            },
+                            child: const Icon(Icons.keyboard_arrow_right),
+                          ),
+                        ],
+                      ),
+                      FloatingActionButton(
+                        heroTag: 'down',
+                        onPressed: () {
+                          _onScreenKeyEvent('down');
+                        },
+                        child: const Icon(Icons.keyboard_arrow_down),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
           ),
         ),
       ),
