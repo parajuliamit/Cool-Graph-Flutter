@@ -10,36 +10,35 @@ class SandFalling extends StatefulWidget {
   State<SandFalling> createState() => _SandFallingState();
 }
 
-const int _gridSize = 50;
+const int _gridCellSize = 10;
 
 class _SandFallingState extends State<SandFalling> {
+  int _gridSizeW = 0;
+  int _gridSizeH = 0;
   late final Timer _timer;
-
+  late final Random random;
   final Set<(int, int)> _grid = {};
 
   final Set<(int, int)> _nextGrid = {};
 
-  bool _stopAnimating = false;
+  bool _stopAnimating = true;
 
   void _updateGrid() {
     if (_stopAnimating) {
       return;
     }
-    print("Updating grid");
     _nextGrid.clear();
-
     for (var data in _grid) {
       int x = data.$1;
       int y = data.$2;
-      if (y < _gridSize - 1) {
+      if (y < _gridSizeH - 1) {
         if (!_grid.contains((x, y + 1))) {
           _nextGrid.add((x, y + 1));
         } else {
-          Random random = Random();
           bool left = random.nextBool();
           bool leftAvailable = x - 1 >= 0 && !_grid.contains((x - 1, y + 1));
           bool rightAvailable =
-              x + 1 < _gridSize && !_grid.contains((x + 1, y + 1));
+              x + 1 < _gridSizeW && !_grid.contains((x + 1, y + 1));
           if (leftAvailable && (left || !rightAvailable)) {
             _nextGrid.add((x - 1, y + 1));
           } else if (rightAvailable) {
@@ -64,9 +63,9 @@ class _SandFallingState extends State<SandFalling> {
   @override
   void initState() {
     super.initState();
-    _updateGrid();
+    random = Random();
     _timer =
-        Timer.periodic(const Duration(milliseconds: 100), (_) => _updateGrid());
+        Timer.periodic(const Duration(milliseconds: 40), (_) => _updateGrid());
   }
 
   @override
@@ -76,11 +75,16 @@ class _SandFallingState extends State<SandFalling> {
   }
 
   void _addToGrid(details, double height, double width) {
-    int x = (details.localPosition.dx / (width / _gridSize)).floor();
-    int y = (details.localPosition.dy / (height / _gridSize)).floor();
-    if (x < _gridSize && y < _gridSize) {
-      _grid.add((x, y));
+    int x = (details.localPosition.dx / (width / _gridSizeW)).floor();
+    int y = (details.localPosition.dy / (height / _gridSizeH)).floor();
+    for (int i = -2; i < 2; i++) {
+      for (int j = -2; j < 2; j++) {
+        if (x + i < _gridSizeW && y + j < _gridSizeH) {
+          _grid.add((x + i, y + j));
+        }
+      }
     }
+
     _stopAnimating = false;
   }
 
@@ -94,6 +98,8 @@ class _SandFallingState extends State<SandFalling> {
         builder: (BuildContext context, BoxConstraints constraints) {
           double height = constraints.maxHeight;
           double width = constraints.maxWidth;
+          _gridSizeH = (height / _gridCellSize).floor();
+          _gridSizeW = (width / _gridCellSize).floor();
           return GestureDetector(
             onPanUpdate: (details) {
               _addToGrid(details, height, width);
@@ -113,12 +119,12 @@ class _SandFallingState extends State<SandFalling> {
                   int x = data.$1;
                   int y = data.$2;
                   return Positioned(
-                    left: x * (width / _gridSize),
-                    top: y * (height / _gridSize),
+                    left: x * (width / _gridSizeW),
+                    top: y * (height / _gridSizeH),
                     child: Container(
-                      height: height / _gridSize,
-                      width: width / _gridSize,
-                      color: HSLColor.fromAHSL(1, (index / 2.5) % 360, 1, 0.5)
+                      height: height / _gridSizeH,
+                      width: width / _gridSizeW,
+                      color: HSLColor.fromAHSL(1, (index / 4) % 360, 1, 0.5)
                           .toColor(),
                     ),
                   );
