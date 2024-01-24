@@ -21,11 +21,13 @@ class _SandFallingBodyState extends State<SandFallingBody> {
   final Set<(int, int)> _nextGrid = {};
 
   bool _stopAnimation = true;
+  bool _isAnimating = false;
 
   void _updateGrid() {
-    if (_stopAnimation) {
+    if (_stopAnimation || _isAnimating) {
       return;
     }
+    _isAnimating = true;
     _nextGrid.clear();
     for (var data in _grid) {
       int x = data.$1;
@@ -57,6 +59,7 @@ class _SandFallingBodyState extends State<SandFallingBody> {
       _grid.clear();
       _grid.addAll(_nextGrid);
     });
+    _isAnimating = false;
   }
 
   @override
